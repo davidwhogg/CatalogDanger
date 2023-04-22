@@ -40,7 +40,7 @@ Consider the following (true) story:
 Scientific Team~A has a set of $10^5$ well-measured stellar metallicities from a spectroscopic survey, such as \textsl{APOGEE} \cite{apogee}.
 Team A wants a much bigger catalog, so they obtain $>10^7$ low-resolution (XP) spectra of stars from the ESA \textsl{Gaia} Mission \cite{gaiadr3}.
 They use the \textsl{APOGEE--Gaia} overlap as a training set to train a regression; this regression delivers a function $f(\cdot)$ that takes as input a \textsl{Gaia} XP spectrum and outputs a stellar metallicity [Mg/H].
-It works well and delivers accurate predictions (on, say, held-out data).
+It works well and delivers accurate predictions (on, say, held-out data from the training set).
 Scientific Team~B wants to look at the metallicities of stars as a function of orbit and orbital phase in the Milky Way disk.
 This is good: Team~A has a customer.
 Team~A delivers to Team~B a huge catalog of stellar metallicities.
@@ -51,31 +51,41 @@ For example, they find that the metallicity is a strong function of latitude and
 Unfortunately, they also find that the metallicity is a strong function of latitude \emph{at fixed vertical action}.
 That's impossible: Stars don't stay at one latitude over time; their latitudes change as they orbit.
 Their vertical actions are (close to) invariant with time.
-Metallicity depends on action at fixed latitude, but not on latitude at fixed action.
+Metallicity ought to depend on action at fixed latitude, but not on latitude at fixed action.
 
 So what went wrong?
 What went wrong is that the catalog made by Team~A was made by a regression, in which the imputed labels for the non-training-set stars are set by a machine-learning method that (effectively) puts similar labels onto stars with similar spectra.
 That sounds like a good idea, until the problem is looked at from a perspective of \emph{causal inference}.
 If, in the training set, there are stellar properties that are covariant with metallicity, or confounders with metallicity, then the regression can easily ``learn'' the metallicities by learning from the covariant property.
-Higher metallicity stars tend to be at lower latitudes, so they tend to be more dust reddened, so a reddened spectrum tends to be of a higher metallicity star.
-The regression (correctly) learns this and uses it.
+Higher metallicity stars tend to be at lower latitudes in the training set, so they tend to be more dust reddened, so a reddened spectrum tends to be of a higher metallicity star (in the training set).
+The regression (correctly) learns this (true) fact and uses it.
 But then the catalog is not safe for studies of stellar abundances as a function of stellar orbit.
 
 Generalizing a bit further, what went wrong?
-The outputs of discriminative regressions and classifications (like the regression by Team~A) are effectively \emph{posterior estimates} of labels, with the training set serving as an effective prior.
+The outputs of discriminative regressions and classifications (like the regression by Team~A) are effectively \emph{posterior estimates} of labels, with the population training set serving as an effective, empirical prior pdf.
 The regression doesn't know what features in the spectrum are salient to metallicity; it only knows that stars of similar spectra should be given similar labels.
 Thus the regression can (and should) use non-metallicity information to infer metallicity labels, provided that the correlations are reliable in the population that was observed for the training and validation sets.
-As we will discuss below, Team B needs likelihood estimates that are independent of population-level correlations, not posterior estimates based on population priors, to do their science.
+As we will discuss below, Team B needs individual-star likelihood estimates that are independent of population-level correlations, because they want to measure properties of the population.
+They can't use posterior estimates based on training-set population priors to do their science.
+Even if the training set was \emph{exactly} the same as the full final catalog in all properties, the measurements would not safe to use even for individual objects, because the metallicity estimates are being made with reddening information.
 
 Note that these problems with the Team-A catalog are not appearing because the regression by Team~A was done badly.
-Nor is it that Team~A had biased inputs.
-Even if everything Team~A did was done perfectly, and passed all tests with held-out data, Team B will find the catalog unusable for their scientific goals.
+Nor is it that Team~A had incorrect inputs.
+Even if everything Team~A did was done perfectly, and passed all tests with held-out data, Team B will still find the catalog (na\"ively) unusable for their scientific goals.
 The catalog does everything Team~A expected it to do.
-But real data sets have covariances among properties such that no na\"ive regression performed by Team~A will deliver a catalog that is useful for Team~B.
+But real data sets have covariances among properties such that no na\"ive regression performed by Team~A will deliver a catalog that is safe for use by Team~B.
 
-In what follows we will elucidate how catalogs are used in astrophysics, and thereby develop requirements on catalogs to make these uses safe.
+In what follows we will elucidate how catalogs are used in astrophysics to make statements about populations of objects, and thereby develop requirements on catalogs to make these uses safe.
 It will turn out that in order for catalogs to be useful for population studies, it is a requirement that the user be given---or be able to obtain---information that permits construction of likelihood functions or estimators that do not contain population-level prior information.
 This is not the only way to do population-level science; we also discuss alternatives to catalogs that might be more general.
+
+\section{Population inferences}
+
+A catalog contains a set of properties
+
+\section{More anecdotes and examples}
+
+\section{Recommendations and discussion}
 
 \paragraph{Acknowledgements}
 It is a pleasure to thank
