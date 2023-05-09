@@ -14,6 +14,10 @@
 \markboth{}{\color{gray}\sffamily Hogg / What is a catalog?}
 \sloppy\sloppypar\raggedbottom\frenchspacing
 
+% Math
+\newcommand{\given}{\,|\,}
+\newcommand{\dd}{\mathrm{d}}
+
 \title{\textbf{What is a catalog?}}
 \author{David W. Hogg}
 \date{Draft in progress as of \today}
@@ -79,11 +83,96 @@ In what follows we will elucidate how catalogs are used in astrophysics to make 
 It will turn out that in order for catalogs to be useful for population studies, it is a requirement that the user be given---or be able to obtain---information that permits construction of likelihood functions or estimators that do not contain population-level prior information.
 This is not the only way to do population-level science; we also discuss alternatives to catalogs that might be more general.
 
+\section{Catalog and inference generalities}
+
+Imagine that some data-taking project has obtained some kind of valuable data object $y_n$ for every source $n$ in a set of $N$ sources.
+This data object $y_n$ might be a spectrum, or some photometry, or a light curve.
+For now we will assume that all of these data objects are the same size or shape, but nothing we do going forward will depend strongly on this assumption.
+If you want a concrete picture, imagine that each source $n$ is a star, and the corresponding data object $y_n$ is a 10,000-pixel spectrum of that star.
+
+Now imagine that each star $n$ has important, scientifically valuable latent properties $\alpha_n$, which are not directly observable, but which can be inferred from the data object $y_n$.
+For concreteness, $\alpha_n$ might be the age, mass, and composition (element abundances)\footnote{There is an old---and substantially true---classical conjecture that all of the properties of a star can be predicted from its age, mass, and composition.} of the star $n$.
+
+In many situations, you don't have (or don't want) access to the data objects $y_n$.
+Instead you just get (or want) estimates $\hat{\alpha}_n$ of the latent parameters.
+For example, you might get an estimate of the age, mass, and composition for each star $n$.
+That might be called \emph{a catalog} of stellar parameters.
+In the best-case scenario, this catalog also includes an uncertainty variance estimate $\hat{\Sigma}_n$ for each source, which is maybe an uncertainty variance tensor corresponding to the variance of the estimator that produced the estimate $\hat{\alpha}_n$.
+Sometimes catalogs include much more sophisticated outputs, like samplings or posterior probability distributions; we will return to these possibilities below.
+
+What are these catalog entries $\hat{\alpha}_n$, and how can we use them?
+One (nearly ideal, frequentist) possibility is that the estimates $\hat{\alpha}_n$ and the uncertainties $\hat{\Sigma}_n$ give some approximate representation of an individual-object \emph{likelihood function} for object $n$.
+The individual-object likelihood function is $p(y_n\given\alpha)$, which is the probability density for the data given the latent parameters, evaluated at the empirically observed data.
+This function can be constructed when we have a full \emph{forward model} or physics-driven \emph{generative model} of the data $y_n$, including the noise.
+That is, maybe each estimate $\hat{\alpha}_n$ and uncertainty variance $\hat{\Sigma}_n$ are given by
+\begin{align}
+    \hat{\alpha}_n & \leftarrow \arg\max_{\alpha} p(y_n\given\alpha) \\
+    \hat{\Sigma}_n & \leftarrow \left[-\frac{\dd^2}{\dd\alpha^2}\ln p(y_n\given\alpha)\right]_{\hat{\alpha}_n}^{-1} ~.
+\end{align}
+These are reasonable choices, when the likelihood function is tractable.
+In the not-uncommon case that the likelihood (seen as a function of the latents $\alpha$) is approximately proportional to a Gaussian function, these two parameters set the location and width (volume) of that Gaussian function.
+More generally, we will think of $\hat{\alpha}_n$ as some kind of estimator made by (approximately) optimizing a likelihood function, or some approximation thereto.
+
+In the Bayesian case, these catalog entries might be related to an individual-object \emph{posterior pdf} instead.
+The individual-object posterior pdf is $p(\alpha\given y_n)$, which is the probability density for the latent $\alpha$ given the data.
+This function can be constructed when we have the likelihood function plus an individual-object prior pdf $p(\alpha\given\theta^\ast)$;
+\begin{align}
+    p(\alpha\given y_n) &= \frac{1}{Z_n}\,p(y_n\given\alpha)\,p(\alpha\given\theta^\ast) ~,
+\end{align}
+where $Z_n$ is a normalization constant to make the units or normalization integrals work out,
+and $\theta^\ast$ is a set of parameters or decisions or hyper-parameters describing the properties of the prior pdf.
+In this case, each catalog entry $\tilde{\alpha}_n$ might be a mean-of-posterior estimate, and the uncertainty variance estimate $\tilde{\Sigma}_n$ might be a variance-of-posterior estimate:
+\begin{align}
+    \tilde{\alpha}_n & \leftarrow \int \alpha\,p(\alpha\given y_n)\,\dd\alpha \\
+    \tilde{\Sigma}_n & \leftarrow \int [\alpha - \tilde{\alpha}_n]^2\,p(\alpha\given y_n)\,\dd\alpha ~.
+\end{align}
+In the not-uncommon case that the posterior pdf is approximately Gaussian, these two parameters set the location and width (volume) of that Gaussian.
+More generally, we will think of the Bayesian estimator $\tilde{\alpha}_n$ as some kind of estimator made by taking a moment or optimum of a posterior pdf, or some approximation thereto.
+
+In both cases---frequentist and Bayesian---the catalog contains, for each star $n$, an estimate of the latents and an uncertainty variance thereon.
+In the frequentist case, these are descriptions or indicators of the likelihood function.
+In the Bayesian case, these are descriptions or indicators of the posterior pdf.
+
+Sometimes there are nuisance parameters.
+For example.... HOGG CALIBRATION.
+Marginalized likelihoods.
+Profile likelihoods.
+
+What if I get a sampling or a pdf rather than a value for the latents?
+
+What if I only care about the age? What do I do?
+
+Now what happens if they make the catalog using a discriminative ML regression method?
+
+Now what happens if they make the catalog using a generative ML model?
+
+Note that we are assuming everywhere that everyone has done everything right.
+We are not criticizing bad methods of making catalogs.
+We are exposing the point that even good catalogs can make for bad population inferences.
+
 \section{Population inferences}
 
-A catalog contains a set of properties
+Simplest possible inference: Take the mean age of stars in some part of phase space.
 
-\section{More anecdotes and examples}
+\section{Examples}
+
+\subsection{Why does \textsl{Gaia} have negative parallaxes?}
+
+\subsection{Lutz--Kelker corrections}
+
+\subsection{Sodium abundances in \textsl{APOGEE}}
+
+\subsection{What else?}
+
+\section{Objections and exceptions}
+
+\subsection{But what if I am using flat priors?}
+
+\subsection{What if test is statistically identical to train?}
+
+\subsection{What if my prior is only over nuisance parameters?}
+
+\subsection{What else?}
 
 \section{Recommendations and discussion}
 
