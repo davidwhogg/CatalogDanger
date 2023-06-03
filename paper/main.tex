@@ -11,7 +11,7 @@
 \addtolength{\textheight}{2.00in}
 \linespread{1.08}
 \pagestyle{myheadings}
-\markboth{}{\color{gray}\sffamily Hogg / What is a catalog?}
+\markboth{}{\color{gray}\sffamily What is a catalog?}
 \sloppy\sloppypar\raggedbottom\frenchspacing
 
 % Math
@@ -19,24 +19,24 @@
 \newcommand{\dd}{\mathrm{d}}
 
 \title{\textbf{What is a catalog?}}
-\author{David W. Hogg}
+\author{David W. Hogg, Adrian Price-Whelan, others?}
 \date{Draft in progress as of \today}
 
 \begin{document}
 
 \maketitle\thispagestyle{empty}
 
-\begin{abstract}\noindent
+\paragraph{Abstract:}
     Observational astronomy projects often produce catalogs---of stars, galaxies, quasars, planet hosts, and so on---for use in other projects.
     How can we use a catalog responsibly to understand the population of objects under study?
     The answer to this turns out to depend on how the catalog was made.
-    In particular, if the catalog entries were obtained by operations on a set of (nearly) independent or separable likelihood functions, the catalog can be used much more straightforwardly than if the catalog entries were obtained by a supervised method or operations on a posterior pdf or a method that involves implicitly or explicitly population-level properties.
+    In particular, if the catalog entries were obtained by operations on a set of (nearly) independent or separable likelihood functions, the catalog can be used much more straightforwardly than if the catalog entries were obtained by a discriminative machine-learning method or operations on a posterior pdf or any method that involves implicitly or explicitly population-level properties.
     This is true no matter whether the subsequent analyses of the catalog are Bayesian or frequentist.
-    Importantly, at the present day, many important catalogs are being made from the outputs of MCMC runs or supervised, discriminative machine-learning methods (classifications or regressions).
+    Importantly, at the present day, many important catalogs are being made from the outputs of MCMC runs or supervised, discriminative machine-learning methods.
     These catalogs are very hard or even impossible to use for population studies.
-    I demonstrate these points mathematically, and also with toy examples from cosmology, stars, and exoplanets.
-    I recommend that catalogs be designed and made with the feasibility of particular end-user investigations as explicit requirements.
-\end{abstract}
+    Even taking a mean value of a collection of catalog entries is unjustified in these cases.
+    We demonstrate these points mathematically, and also with toy examples from cosmology, stars, and exoplanets.
+    We recommend that catalogs be designed and made with the feasibility of particular end-user investigations as explicit requirements.
 
 \section{Introduction}
 
@@ -93,15 +93,15 @@ If you want a concrete picture, imagine that each source $n$ is a star, and the 
 Now imagine that each star $n$ has important, scientifically valuable latent properties $\alpha_n$, which are not directly observable, but which can be inferred from the data object $y_n$.
 For concreteness, $\alpha_n$ might be the age, mass, and composition (element abundances)\footnote{There is an old---and substantially true---classical conjecture that all of the properties of a star can be predicted from its age, mass, and composition.} of the star $n$.
 
-In many situations, you don't have (or don't want) access to the data objects $y_n$.
-Instead you just get (or want) estimates $\hat{\alpha}_n$ of the latent parameters.
+In many situations, you don't have access to the data objects $y_n$.
+Instead you just get estimates $\hat{\alpha}_n$ of the latent parameters.
 For example, you might get an estimate of the age, mass, and composition for each star $n$.
 That might be called \emph{a catalog} of stellar parameters.
-In the best-case scenario, this catalog also includes an uncertainty variance estimate $\hat{\Sigma}_n$ for each source, which is maybe an uncertainty variance tensor corresponding to the variance of the estimator that produced the estimate $\hat{\alpha}_n$.
+In the best-case scenario, this catalog also includes an uncertainty variance estimate $\hat{\Sigma}_n$ for each source, which is maybe an uncertainty variance tensor corresponding to (or indicating) the variance of the estimator that produced the estimate $\hat{\alpha}_n$.
 Sometimes catalogs include much more sophisticated outputs, like samplings or posterior probability distributions; we will return to these possibilities below.
 
 What are these catalog entries $\hat{\alpha}_n$, and how can we use them?
-One (nearly ideal, frequentist) possibility is that the estimates $\hat{\alpha}_n$ and the uncertainties $\hat{\Sigma}_n$ give some approximate representation of an individual-object \emph{likelihood function} for object $n$.
+One (nearly ideal) frequentist possibility is that the estimates $\hat{\alpha}_n$ and the uncertainties $\hat{\Sigma}_n$ give some approximate representation of an individual-object \emph{likelihood function} for object $n$.
 The individual-object likelihood function is $p(y_n\given\alpha)$, which is the probability density for the data given the latent parameters, evaluated at the empirically observed data.
 This function can be constructed when we have a full \emph{forward model} or physics-driven \emph{generative model} of the data $y_n$, including the noise.
 That is, maybe each estimate $\hat{\alpha}_n$ and uncertainty variance $\hat{\Sigma}_n$ are given by
@@ -130,19 +130,23 @@ In the not-uncommon case that the posterior pdf is approximately Gaussian, these
 More generally, we will think of the Bayesian estimator $\tilde{\alpha}_n$ as some kind of estimator made by taking a moment or optimum of a posterior pdf, or some approximation thereto.
 
 In both cases---frequentist and Bayesian---the catalog contains, for each star $n$, an estimate of the latents and an uncertainty variance thereon.
-In the frequentist case, these are descriptions or indicators of the likelihood function.
-In the Bayesian case, these are descriptions or indicators of the posterior pdf.
+In the frequentist case, these ($\hat{\alpha}_n, \hat{\Sigma}_n$) are descriptions or indicators of the likelihood function.
+In the Bayesian case, these ($\tilde{\alpha}_n, \tilde{\Sigma}_n$) are descriptions or indicators of the posterior pdf.
 
 Sometimes there are nuisance parameters.
-For example.... HOGG CALIBRATION.
+For example.... HOGG explain how CALIBRATION and other common parameters are dealt with by either profiling or else marginalization.
+That changes nothing serious here.
 Marginalized likelihoods.
 Profile likelihoods.
+Marginalized posteriors.
 
-What if I get a sampling or a pdf rather than a value for the latents?
+HOGG: What if I get a sampling or a pdf rather than a value for the latents? Then this is like the Bayesian case.
 
-What if I only care about the age? What do I do?
+HOGG: What if I only care about the age? What do I do? Then you run a function $f(alpha)$ on $\hat{\alpha}_n$ to extract it.
 
-Now what happens if they make the catalog using a discriminative ML regression method?
+HOGG: Now what happens if they make the catalog using a discriminative ML regression method?
+The key point here is that the returned values on the test set are (effectively) descriptions of the posteriors $p(\alpha\given y_n)$.
+
 
 Now what happens if they make the catalog using a generative ML model?
 
@@ -178,8 +182,11 @@ Simplest possible inference: Take the mean age of stars in some part of phase sp
 
 \paragraph{Acknowledgements}
 It is a pleasure to thank
-  Neige Frankel (CITA)
+  Vedant Chandra (Harvard),
+  Neige Frankel (CITA),
+and the Machine Learning Journal Club at the Flatirion Institute
 for valuable discussions and input.
+This research was performed in part at the Gaia XPloration, hosted by the Institute of Astronomy in Cambridge UK in 2023 May.
 
 \bibliographystyle{plain}
 \raggedright
